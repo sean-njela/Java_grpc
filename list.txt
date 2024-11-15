@@ -1,0 +1,420 @@
+Hello.java
+HelloClient.java
+HelloInterface.java
+list.txt
+MyObject.java
+MyRMI.java
+File: Hello.java
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+
+import java.rmi.*;
+import java.rmi.server.UnicastRemoteObject;
+
+/**
+ *
+ * @author tnjela
+ */
+public class Hello extends UnicastRemoteObject implements HelloInterface {
+    // Internal property of the object for storing the message
+    private final String message;
+    // Method for setting the property
+    public Hello (String msg) throws RemoteException {
+        message = msg;
+    }
+    // Method for retrieving the property
+    public String say() throws RemoteException {
+        return message;
+    }
+    // Method that adds 2 numbers
+    public int addNumbers(int a, int b) throws RemoteException {
+        return a + b;
+    }
+    // Method operating on the object-type parameter
+    public int calculateVolume(MyObject o) throws RemoteException
+    {
+        return o.getBreadth() * o.getHeight() * o.getLength();
+    }
+}
+
+-----------------
+
+File: HelloClient.java
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+
+import java.rmi.Naming;
+import java.util.Scanner;
+
+/**
+ *
+ * @author tnjela
+ */
+public class HelloClient 
+{
+    public static void main(String[] argv)
+    {
+		// The object for reading from the keyboard
+        Scanner keyb = new Scanner(System.in); 
+        int x, y;
+		// The object that will be passed as the parameter
+        MyObject mo = new MyObject();
+        try {
+			// Here we retreive the interface provided by the server
+            HelloInterface hi = (HelloInterface)Naming.lookup("//localhost:5001/Hello");
+			// ... and print the message
+            System.out.println(hi.say());
+            // This is the part where we pass two numbers for additions
+            System.out.println("Please enter the first argument");
+            x = keyb.nextInt();
+            System.out.println("Please enter the second argument");
+            y = keyb.nextInt();
+            System.out.println("Result: " + hi.addNumbers(x,y));
+			// Here we perform operation on the object passed as the argument
+            System.out.println("Volume: " + hi.calculateVolume(mo));
+        }
+        catch (Exception e)
+        {
+            System.out.println("Client error: " + e.getMessage());
+        }   
+    }
+}
+
+-----------------
+
+File: HelloInterface.java
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Interface.java to edit this template
+ */
+
+import java.rmi.*;
+
+/**
+ *
+ * @author tnjela
+ */
+public interface HelloInterface extends Remote {
+	// The list of operations performed by the server
+    public String say() throws RemoteException;
+    public int addNumbers(int a, int b) throws RemoteException;
+    public int calculateVolume(MyObject o) throws RemoteException;
+}
+
+-----------------
+
+File: list.txt
+
+-----------------
+
+File: list_contents.sh
+#!/usr/bin/bash
+
+for file in *; do 
+  echo "File: $file" >> list.txt
+  cat "$file" >> list.txt
+  echo -e "\n-----------------\n" >> list.txt
+done
+-----------------
+
+File: MyObject.java
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+
+import java.io.Serializable;
+
+/**
+ *
+ * @author tnjela
+ */
+ 
+// This is the definition of the object that will be passed as the remote argument
+public class MyObject implements Serializable {
+	// Internal properties
+    private int length;
+    private int height;
+    private int breadth;
+    // Constructor
+    public MyObject()
+    {
+        this.length = 4;
+        this.height = 5;
+        this.breadth = 3;
+    }
+    // Setters and getters
+    int getLength()
+    {
+        return this.length;
+    }
+    
+    void setLength(int l)
+    {
+        this.length = l;
+    }
+    
+    int getHeight()
+    {
+        return this.height;
+    }
+    
+    void setHeight(int h)
+    {
+        this.height = h;
+    }
+    
+    int getBreadth()
+    {
+        return this.breadth;
+    }
+    
+    void setBreadth(int b)
+    {
+        this.breadth = b;
+    }
+}
+
+-----------------
+
+File: MyRMI.java
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
+ */
+
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+
+/**
+ *
+ * @author tnjela
+ */
+public class MyRMI {
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        try {
+			// Here we create the registry for interfaces
+            Registry r = LocateRegistry.createRegistry(5001);
+			// ... and make the Hello object available from the outside
+            r.rebind("Hello", new Hello("Hello from the RMI server!"));
+            System.out.println("The RMI server is up!");
+        }
+        catch (Exception e)
+        {
+            System.out.println("Server error: " + e.getMessage());
+        }
+        
+    }
+    
+}
+
+-----------------
+
+File: Hello.java
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+
+import java.rmi.*;
+import java.rmi.server.UnicastRemoteObject;
+
+/**
+ *
+ * @author tnjela
+ */
+public class Hello extends UnicastRemoteObject implements HelloInterface {
+    // Internal property of the object for storing the message
+    private final String message;
+    // Method for setting the property
+    public Hello (String msg) throws RemoteException {
+        message = msg;
+    }
+    // Method for retrieving the property
+    public String say() throws RemoteException {
+        return message;
+    }
+    // Method that adds 2 numbers
+    public int addNumbers(int a, int b) throws RemoteException {
+        return a + b;
+    }
+    // Method operating on the object-type parameter
+    public int calculateVolume(MyObject o) throws RemoteException
+    {
+        return o.getBreadth() * o.getHeight() * o.getLength();
+    }
+}
+
+-----------------
+
+File: HelloClient.java
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+
+import java.rmi.Naming;
+import java.util.Scanner;
+
+/**
+ *
+ * @author tnjela
+ */
+public class HelloClient 
+{
+    public static void main(String[] argv)
+    {
+		// The object for reading from the keyboard
+        Scanner keyb = new Scanner(System.in); 
+        int x, y;
+		// The object that will be passed as the parameter
+        MyObject mo = new MyObject();
+        try {
+			// Here we retreive the interface provided by the server
+            HelloInterface hi = (HelloInterface)Naming.lookup("//localhost:5001/Hello");
+			// ... and print the message
+            System.out.println(hi.say());
+            // This is the part where we pass two numbers for additions
+            System.out.println("Please enter the first argument");
+            x = keyb.nextInt();
+            System.out.println("Please enter the second argument");
+            y = keyb.nextInt();
+            System.out.println("Result: " + hi.addNumbers(x,y));
+			// Here we perform operation on the object passed as the argument
+            System.out.println("Volume: " + hi.calculateVolume(mo));
+        }
+        catch (Exception e)
+        {
+            System.out.println("Client error: " + e.getMessage());
+        }   
+    }
+}
+
+-----------------
+
+File: HelloInterface.java
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Interface.java to edit this template
+ */
+
+import java.rmi.*;
+
+/**
+ *
+ * @author tnjela
+ */
+public interface HelloInterface extends Remote {
+	// The list of operations performed by the server
+    public String say() throws RemoteException;
+    public int addNumbers(int a, int b) throws RemoteException;
+    public int calculateVolume(MyObject o) throws RemoteException;
+}
+
+-----------------
+
+File: MyObject.java
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+
+import java.io.Serializable;
+
+/**
+ *
+ * @author tnjela
+ */
+ 
+// This is the definition of the object that will be passed as the remote argument
+public class MyObject implements Serializable {
+	// Internal properties
+    private int length;
+    private int height;
+    private int breadth;
+    // Constructor
+    public MyObject()
+    {
+        this.length = 4;
+        this.height = 5;
+        this.breadth = 3;
+    }
+    // Setters and getters
+    int getLength()
+    {
+        return this.length;
+    }
+    
+    void setLength(int l)
+    {
+        this.length = l;
+    }
+    
+    int getHeight()
+    {
+        return this.height;
+    }
+    
+    void setHeight(int h)
+    {
+        this.height = h;
+    }
+    
+    int getBreadth()
+    {
+        return this.breadth;
+    }
+    
+    void setBreadth(int b)
+    {
+        this.breadth = b;
+    }
+}
+
+-----------------
+
+File: MyRMI.java
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
+ */
+
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+
+/**
+ *
+ * @author tnjela
+ */
+public class MyRMI {
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        try {
+			// Here we create the registry for interfaces
+            Registry r = LocateRegistry.createRegistry(5001);
+			// ... and make the Hello object available from the outside
+            r.rebind("Hello", new Hello("Hello from the RMI server!"));
+            System.out.println("The RMI server is up!");
+        }
+        catch (Exception e)
+        {
+            System.out.println("Server error: " + e.getMessage());
+        }
+        
+    }
+    
+}
+
+-----------------
+
